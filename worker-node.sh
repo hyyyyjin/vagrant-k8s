@@ -43,6 +43,13 @@ net.ipv4.ip_forward                 = 1
 EOF
 sysctl --system
 
+# 파일 상단에 추가
+INTERNAL_IP=$(ip -f inet addr show enp0s8 2>/dev/null | grep -Po 'inet \K[\d.]+')
+
+# kubeadm join 명령어 실행 전에 추가
+echo "KUBELET_EXTRA_ARGS=--node-ip=$INTERNAL_IP" > /etc/default/kubelet
+systemctl restart kubelet
+
 # Master 노드에 Join
 bash /vagrant/join.sh
 

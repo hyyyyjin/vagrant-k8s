@@ -44,7 +44,17 @@ EOF
 sysctl --system
 
 # Master 노드 초기화
-kubeadm init --apiserver-advertise-address=192.168.56.10 --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=all > /root/kubeadm-init.output
+INTERNAL_IP="192.168.56.10"  # master node의 고정 IP
+
+kubeadm init --apiserver-advertise-address=$INTERNAL_IP --node-name=$(hostname -s) --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=all > /root/kubeadm-init.output
+
+# kubelet 설정 추가
+cat > /etc/default/kubelet << EOF
+KUBELET_EXTRA_ARGS=--node-ip=$INTERNAL_IP
+EOF
+
+# kubelet 재시작
+systemctl restart kubelet
 
 # kubeconfig 설정
 mkdir -p /home/vagrant/.kube
