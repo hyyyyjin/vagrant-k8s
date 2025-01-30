@@ -14,6 +14,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "k8s-master" do |master|
     master.vm.hostname = "k8s-master"
     master.vm.network "private_network", ip: MASTER_IP, virtualbox__intnet: false 
+    master.vm.network "forwarded_port", guest: 6443, host: 6443, host_ip: "192.168.0.7"
     master.vm.provider "virtualbox" do |vb|
       vb.memory = 2048
       vb.cpus = 2
